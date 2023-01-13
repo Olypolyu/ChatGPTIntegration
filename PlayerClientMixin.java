@@ -47,18 +47,19 @@ public abstract class PlayerClientMixin extends EntityPlayer {
 
             // get chat
             List<ChatLine> chat = ((ChatInterfaceMixin) Minecraft.getMinecraft().ingameGUI).getChatMessageList();
-            String lastChat = chat.get(0).message;
+            String lastChatLine = chat.get(0).message;
 
             // get username
-            String username = extractUsername(lastChat);
+            String username = extractUsername(lastChatLine);
             if (username != null) username = username.substring(2, username.length()-2);
             else username = "null";
 
             // remove username from prompt
-            lastChat = lastChat.replaceAll("<.*?> ", "");
+            lastChatLine = lastChatLine.replaceAll("<.*?> ", "");
 
             String message;
-            message = ChatGPT.chatGPT(lastChat, username);
+            message = ChatGPT.chatGPT(lastChatLine, username);
+            // really need a better of filtering out invalid characters from this
             message = message.replaceAll("\n", "");
 
             this.addChatMessage("message length: " + message.length());
@@ -66,8 +67,8 @@ public abstract class PlayerClientMixin extends EntityPlayer {
             int lineLength = 94;
             for (int i = 0; i < message.length(); i += lineLength) {
                 if (i + lineLength < message.length()) {
-                    this.invokeSendChatMessage("<GTP> " + message.substring(i, i + lineLength));
-                } else this.invokeSendChatMessage("<GTP> " + message.substring(i));
+                    this.invokeSendChatMessage("<GPT> " + message.substring(i, i + lineLength));
+                } else this.invokeSendChatMessage("<GPT> " + message.substring(i));
             }
         }
 
